@@ -60,3 +60,27 @@ on public.products for all
 to anon, authenticated
 using (true)
 with check (true);
+
+-- ============================================================================
+-- HISTÓRICO DE VENDAS (para Dashboard Mensal — ocupa < 1 MB/ano no plano grátis)
+-- ============================================================================
+create table if not exists public.sales (
+  id text primary key,
+  product_id text not null,
+  product_name text not null,
+  category text not null check (category in ('Chupa-chupa', 'Picolé', 'Sorvete')),
+  emoji text not null default '🍦',
+  quantity integer not null check (quantity > 0),
+  unit_price numeric(10, 2) not null default 0,
+  sold_at timestamptz not null default now()
+);
+
+create index if not exists idx_sales_sold_at on public.sales (sold_at desc);
+
+alter table public.sales enable row level security;
+
+create policy "Leitura e escrita de vendas do balcao"
+on public.sales for all
+to anon, authenticated
+using (true)
+with check (true);

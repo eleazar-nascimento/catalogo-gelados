@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertCircle,
+  BarChart3,
   Check,
   Cloud,
   CloudOff,
@@ -11,6 +12,7 @@ import {
   Plus,
   RotateCcw,
   ShoppingBag,
+  Snowflake,
   Sparkles,
   Store,
   Trash2,
@@ -19,6 +21,7 @@ import {
 } from 'lucide-react';
 import { WhatsAppIcon } from './components/icons/WhatsAppIcon';
 import { PinGate } from './components/PinGate';
+import { SalesDashboard } from './components/SalesDashboard';
 import { Modal } from './components/ui/Modal';
 import { ClientCardSkeleton, SellerCardSkeleton } from './components/ui/Skeleton';
 import { ThemeToggle } from './components/ui/ThemeToggle';
@@ -34,6 +37,7 @@ import {
 } from './constants/catalog';
 import type { IconGroup } from './constants/catalog';
 import { useProductsSync } from './hooks/useProductsSync';
+import { useSalesSync } from './hooks/useSalesSync';
 import { useTheme } from './hooks/useTheme';
 import type {
   FilterCategory,
@@ -103,6 +107,9 @@ export default function App() {
     restoreSnapshotRemote,
   } = useProductsSync();
 
+  const { sales, recordSale, removeSale } = useSalesSync();
+  const [sellerTab, setSellerTab] = useState<'freezer' | 'dashboard'>('freezer');
+
   const [selectedCategory, setSelectedCategory] = useState<FilterCategory>('Todos');
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -162,9 +169,13 @@ export default function App() {
     }, 350);
   };
 
-  const showUndoToast = (message: string, previousProducts: Product[]) => {
+  const showUndoToast = (
+    message: string,
+    previousProducts: Product[],
+    saleIdToUndo?: string
+  ) => {
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-    setToast({ message, previousProducts });
+    setToast({ message, previousProducts, saleIdToUndo });
     toastTimerRef.current = setTimeout(() => {
       setToast(null);
     }, 6500);
@@ -177,6 +188,9 @@ export default function App() {
     const previous = toast.previousProducts;
     setProducts(previous);
     void restoreSnapshotRemote(previous);
+    if (toast.saleIdToUndo) {
+      removeSale(toast.saleIdToUndo);
+    }
     setToast(null);
   };
 
@@ -197,12 +211,14 @@ export default function App() {
     );
     queueStockDelta(id, actualDelta);
 
+    const saleId = actualDelta < 0 ? recordSale(target, Math.abs(actualDelta)) : undefined;
+
     const actionText =
       actualDelta < 0
         ? `Baixa salva: ${actualDelta} ${target.name}`
         : `Reposição salva: +${actualDelta} ${target.name}`;
 
-    showUndoToast(actionText, snapshot);
+    showUndoToast(actionText, snapshot, saleId);
   };
 
   const openExactStockModal = (product: Product) => {
@@ -217,6 +233,7 @@ export default function App() {
 
     const parsed = Number.parseInt(customStockInput, 10);
     const finalStock = Number.isNaN(parsed) || parsed < 0 ? 0 : parsed;
+    const diff = editingStockProduct.stock - finalStock;
     const snapshot = [...products];
 
     setProducts((prev) =>
@@ -227,9 +244,12 @@ export default function App() {
     pulseProductCounter(editingStockProduct.id);
     void setExactStockRemote(editingStockProduct.id, finalStock);
 
+    const saleId = diff > 0 ? recordSale(editingStockProduct, diff) : undefined;
+
     showUndoToast(
       `Estoque ajustado: ${editingStockProduct.name} agora tem ${finalStock}`,
-      snapshot
+      snapshot,
+      saleId
     );
     setEditingStockProduct(null);
   };
@@ -587,50 +607,84 @@ export default function App() {
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="grid grid-cols-2 gap-2.5 mb-4 p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800/80">
               <button
                 type="button"
-                onClick={openCreateModal}
-                className="flex-1 min-h-[56px] flex items-center justify-center gap-2 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white active:scale-95 text-white dark:text-slate-950 font-bold text-lg px-5 py-4 rounded-2xl shadow-sm transition-all touch-manipulation"
+                onClick={() => setSellerTab('freezer')}
+                className={`min-h-[48px] rounded-xl font-extrabold text-base flex items-center justify-center gap-2 transition-all active:scale-95 touch-manipulation ${
+                  sellerTab === 'freezer'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
               >
-                <Plus className="w-6 h-6" />
-                Novo Sabor
+                <Snowflake className="w-5 h-5 text-[#4BBBC2]" />
+                Freezer
               </button>
-
               <button
                 type="button"
-                onClick={openSellerShareWhatsApp}
-                className="flex-1 min-h-[56px] flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1FB858] active:scale-95 text-white font-extrabold text-lg px-6 py-4 rounded-2xl shadow-md transition-all touch-manipulation"
+                onClick={() => setSellerTab('dashboard')}
+                className={`min-h-[48px] rounded-xl font-extrabold text-base flex items-center justify-center gap-2 transition-all active:scale-95 touch-manipulation ${
+                  sellerTab === 'dashboard'
+                    ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }`}
               >
-                <WhatsAppIcon className="w-6 h-6 shrink-0" />
-                Mandar no WhatsApp
+                <BarChart3 className="w-5 h-5 text-[#F27B96]" />
+                Vendas do Mês
               </button>
             </div>
 
-            <nav
-              aria-label="Categorias"
-              className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-5 pt-5 border-t border-slate-200 dark:border-slate-800"
-            >
-              {FILTER_CATEGORIES.map((cat) => {
-                const isActive = selectedCategory === cat;
-                return (
+            {sellerTab === 'freezer' && (
+              <>
+                <div className="flex flex-col sm:flex-row gap-3">
                   <button
-                    key={cat}
                     type="button"
-                    onClick={() => setSelectedCategory(cat)}
-                    className={`min-h-[56px] py-3 px-3 rounded-2xl text-lg font-extrabold transition-all border-2 active:scale-95 touch-manipulation ${
-                      isActive
-                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-900 dark:border-white shadow-sm'
-                        : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
-                    }`}
+                    onClick={openCreateModal}
+                    className="flex-1 min-h-[56px] flex items-center justify-center gap-2 bg-slate-900 dark:bg-slate-100 hover:bg-slate-800 dark:hover:bg-white active:scale-95 text-white dark:text-slate-950 font-bold text-lg px-5 py-4 rounded-2xl shadow-sm transition-all touch-manipulation"
                   >
-                    {cat}
+                    <Plus className="w-6 h-6" />
+                    Novo Sabor
                   </button>
-                );
-              })}
-            </nav>
+
+                  <button
+                    type="button"
+                    onClick={openSellerShareWhatsApp}
+                    className="flex-1 min-h-[56px] flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1FB858] active:scale-95 text-white font-extrabold text-lg px-6 py-4 rounded-2xl shadow-md transition-all touch-manipulation"
+                  >
+                    <WhatsAppIcon className="w-6 h-6 shrink-0" />
+                    Mandar no WhatsApp
+                  </button>
+                </div>
+
+                <nav
+                  aria-label="Categorias"
+                  className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-5 pt-5 border-t border-slate-200 dark:border-slate-800"
+                >
+                  {FILTER_CATEGORIES.map((cat) => {
+                    const isActive = selectedCategory === cat;
+                    return (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setSelectedCategory(cat)}
+                        className={`min-h-[56px] py-3 px-3 rounded-2xl text-lg font-extrabold transition-all border-2 active:scale-95 touch-manipulation ${
+                          isActive
+                            ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 border-slate-900 dark:border-white shadow-sm'
+                            : 'bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                        }`}
+                      >
+                        {cat}
+                      </button>
+                    );
+                  })}
+                </nav>
+              </>
+            )}
           </header>
 
+          {sellerTab === 'dashboard' ? (
+            <SalesDashboard sales={sales} />
+          ) : (
           <section
             aria-busy={isLoading}
             aria-label={isLoading ? 'Carregando estoque' : 'Lista de sabores no freezer'}
@@ -797,6 +851,7 @@ export default function App() {
               );
             })}
           </section>
+          )}
         </main>
       )}
 

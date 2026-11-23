@@ -23,6 +23,18 @@ export interface Product {
 export interface ToastState {
   message: string;
   previousProducts: Product[];
+  saleIdToUndo?: string;
+}
+
+export interface SaleRecord {
+  id: string;
+  productId: string;
+  productName: string;
+  category: ProductCategory;
+  emoji: string;
+  quantity: number;
+  unitPrice: number;
+  soldAt: string; // ISO string
 }
 
 export interface WhatsAppModalState {
