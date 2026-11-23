@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-label="Logo Dulka Chup-Chup Gourmet">
+  <!-- Fundo circular turquesa da marca -->
+  <circle cx="100" cy="100" r="96" fill="#4BBBC2" />
+
+  <!-- Moldura escalopada branca com borda rosa -->
+  <path
+    d="M 100 13
+       C 111 13 116 20 123 24
+       C 131 20 140 22 146 28
+       C 155 29 162 35 164 44
+       C 172 48 176 57 175 66
+       C 182 73 185 82 181 91
+       C 187 99 187 109 181 117
+       C 184 126 180 135 173 141
+       C 173 150 167 158 158 161
+       C 155 170 147 175 137 175
+       C 131 182 121 185 112 182
+       C 104 188 94 188 86 182
+       C 77 185 67 182 61 175
+       C 51 175 43 170 40 161
+       C 31 158 25 150 25 141
+       C 18 135 14 126 17 117
+       C 11 109 11 99 17 91
+       C 13 82 16 73 23 66
+       C 22 57 26 48 34 44
+       C 36 35 43 29 52 28
+       C 58 22 67 20 75 24
+       C 82 20 89 13 100 13 Z"
+    fill="#FFFFFF"
+    stroke="#F27B96"
+    stroke-width="3.5"
+    stroke-linejoin="round"
+  />
+
+  <!-- Linha interna delicada rosa claro -->
+  <path
+    d="M 100 20
+       C 109 20 114 26 121 30
+       C 128 26 136 28 142 34
+       C 150 35 156 40 158 48
+       C 165 52 169 60 168 68
+       C 174 74 177 83 173 91
+       C 179 98 179 107 173 114
+       C 176 122 173 131 166 136
+       C 166 144 161 151 153 154
+       C 150 162 143 167 134 167
+       C 128 173 119 176 111 173
+       C 104 179 95 179 88 173
+       C 80 176 71 173 65 167
+       C 56 167 49 162 46 154
+       C 38 151 33 144 33 136
+       C 26 131 23 122 26 114
+       C 20 107 20 98 26 91
+       C 22 83 25 74 31 68
+       C 30 60 34 52 41 48
+       C 43 40 49 35 57 34
+       C 63 28 71 26 78 30
+       C 85 26 91 20 100 20 Z"
+    fill="none"
+    stroke="#F9C6D2"
+    stroke-width="2"
+    stroke-linejoin="round"
+  />
+
+  <!-- Detalhe em rosa claro atrás do "l" estilizado -->
+  <path
+    d="M 103 42 C 95 54 97 72 103 86 C 107 95 106 105 100 112"
+    fill="none"
+    stroke="#F9C6D2"
+    stroke-width="7"
+    stroke-linecap="round"
+  />
+
+  <!-- Letra "l" central estilizada (traço característico Dulka) -->
+  <path
+    d="M 97 41 C 88 53 91 71 97 85 C 102 96 101 107 94 114"
+    fill="none"
+    stroke="#F27B96"
+    stroke-width="7.5"
+    stroke-linecap="round"
+  />
+  <path
+    d="M 97 41 C 101 38 106 40 107 45"
+    fill="none"
+    stroke="#F27B96"
+    stroke-width="5.5"
+    stroke-linecap="round"
+  />
+
+  <!-- Tipografia "Du" e "ka" em rosa Dulka -->
+  <text
+    x="86"
+    y="108"
+    text-anchor="end"
+    fill="#F27B96"
+    font-family="'Trebuchet MS', 'Nunito', 'Quicksand', 'Arial Rounded MT Bold', system-ui, sans-serif"
+    font-size="40"
+    font-weight="900"
+    letter-spacing="-1"
+  >Du</text>
+  <text
+    x="109"
+    y="108"
+    text-anchor="start"
+    fill="#F27B96"
+    font-family="'Trebuchet MS', 'Nunito', 'Quicksand', 'Arial Rounded MT Bold', system-ui, sans-serif"
+    font-size="40"
+    font-weight="900"
+    letter-spacing="-1"
+  >ka</text>
+
+  <!-- Subtítulos GOURMET / CHUP-CHUP em marrom chocolate -->
+  <text
+    x="100"
+    y="131"
+    text-anchor="middle"
+    fill="#4A2C2A"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="11.5"
+    font-weight="700"
+    letter-spacing="2.8"
+  >GOURMET</text>
+  <text
+    x="100"
+    y="148"
+    text-anchor="middle"
+    fill="#4A2C2A"
+    font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+    font-size="10.5"
+    font-weight="600"
+    letter-spacing="1.6"
+  >CHUP-CHUP</text>
+</svg>
